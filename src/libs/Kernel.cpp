@@ -44,6 +44,9 @@
 #define baud_rate_setting_checksum CHECKSUM("baud_rate")
 #define uart0_checksum             CHECKSUM("uart0")
 
+#define enable_checksum            CHECKSUM("enable")
+#define uart1_checksum             CHECKSUM("uart1")
+
 #define base_stepping_frequency_checksum            CHECKSUM("base_stepping_frequency")
 #define microseconds_per_step_pulse_checksum        CHECKSUM("microseconds_per_step_pulse")
 #define disable_leds_checksum                       CHECKSUM("leds_disable")
@@ -121,6 +124,13 @@ Kernel::Kernel()
     this->ok_per_line = this->config->value( ok_per_line_checksum )->by_default(true)->as_bool();
 
     this->add_module( this->serial );
+
+    if (this->config->value(uart1_checksum, enable_checksum)->by_default(false)->as_bool())
+    {
+        SerialConsole* serial1 = new(AHB0) SerialConsole(P0_15, P0_16, 
+                this->config->value(uart1_checksum, baud_rate_setting_checksum)->by_default(DEFAULT_SERIAL_BAUD_RATE)->as_number());
+        this->add_module( serial1 );
+    }
 
     // HAL stuff
     add_module( this->slow_ticker = new SlowTicker());
